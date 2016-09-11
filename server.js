@@ -1,30 +1,17 @@
 "use strict";
 
 var http = require("http"),
-	express = require("express");
+	express = require("express"),
+	socketIo = require("socket.io");
+
 
 const app = express();
 app.set("view engine", "jade");
 
-app.use((request, response, next) => {
-	console.log("In middleware 1");
-	//response.write("HEADER");
-	next();
-	console.log("Out middleware 1");
-});
-
 app.use(express.static("./public"));
-
-
-app.use((request, response, next) => {
-	console.log("--In middleware 2");
-	next();
-	console.log("---Out middleware 2");
-});
 
 app.get("/", (request, response) => {
 	response.end("Hello, World!");
-	console.log("In Handler");
 });
 
 app.get("/home", (request, response) => {
@@ -32,6 +19,11 @@ app.get("/home", (request, response) => {
 });
 
 const server = new http.Server(app);
+const io = socketIo(server);
+
+io.on("connection", socket => {
+	console.log("Client connected");
+});
 
 const port = 3000;
 server.listen(port, () => {
